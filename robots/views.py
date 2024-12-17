@@ -2,6 +2,12 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
+
+import datetime
+import openpyxl
+from django.http import HttpResponse
+from django.db.models import Count
+
 from .models import Robot
 
 @csrf_exempt
@@ -39,3 +45,43 @@ def robot_create(request):
             return JsonResponse({"error": "Invalid JSON format."}, status=400)
 
     return JsonResponse({"error": "Only POST method is allowed."}, status=405)
+
+
+
+def generate_production_report(request):
+
+    workbook = openpyxl.Workbook()
+    
+
+    end_date = datetime.date.today()
+    start_date = end_date - datetime.timedelta(days=7)
+    
+    data = Robot.objects.filter(
+        created__date__range=(start_date, end_date)
+    ).values('model', 'version').annotate(
+        weekly_count=Count('id')
+    ).order_by('model', 'version')
+    
+    
+    models = set(item['model'] for item in data)
+    for model in models:
+
+        worksheet = workbook.create_sheet(title=model)
+        worksheet.append(["Модель", "Версия", "Количество за неделю"])  
+        
+
+        for item in data:
+            if item['model'] == model:
+                worksheet.append([item['model'], item['version'], item['weekly_count']])
+    
+
+    if 'Sheet' in workbook.sheetnames:
+        workbook.remove(workbook['Sheet'])
+    
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="production_report.xlsx"'
+    workbook.save(response)
+    return response
