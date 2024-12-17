@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+
+*/migrations/
+db.sqlite3
+
+myenv/
+venv/
+
+*.idea/
+.vscode/
+
+tasks.md
