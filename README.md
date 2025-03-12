@@ -21,7 +21,7 @@ R4C — это сервис для управления производство
 - Pandas + OpenPyXL (для отчетности)  
 - Django Signals (для уведомлений)  
 
-###Process
+### Process
 
 ![Снимок экрана 2024-12-17 124017](https://github.com/user-attachments/assets/7624058f-df6a-4fe9-b127-d7cdad1dcc53)
 ![Снимок экрана 2024-12-17 131349](https://github.com/user-attachments/assets/98cb4a93-a486-4e63-aa93-7f8eff6be60b)
